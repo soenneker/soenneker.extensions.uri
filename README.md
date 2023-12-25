@@ -8,5 +8,5 @@
 ## Installation
 
 ```
-Install-Package Soenneker.Extensions.Uri
+dotnet add package Soenneker.Extensions.Uri
 ```

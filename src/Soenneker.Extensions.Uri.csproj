@@ -39,6 +39,6 @@
 
         
 
-        <PackageReference Include="Soenneker.Utils.RegexCollection" Version="3.0.49" />
+        <PackageReference Include="Soenneker.Utils.RegexCollection" Version="3.0.50" />
     </ItemGroup>
 </Project>

@@ -4,6 +4,9 @@ using System.Runtime.CompilerServices;
 
 namespace Soenneker.Extensions.Uri;
 
+/// <summary>
+/// Represents the uri extension.
+/// </summary>
 public static class UriExtension
 {
     /// <summary>
@@ -99,6 +102,11 @@ public static class UriExtension
         return new System.Uri(result2, UriKind.Absolute);
     }
 
+    /// <summary>
+    /// Removes last segment.
+    /// </summary>
+    /// <param name="uri">The uri.</param>
+    /// <returns>The result of the operation.</returns>
     [Pure, MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static System.Uri RemoveLastSegment(this System.Uri uri)
     {

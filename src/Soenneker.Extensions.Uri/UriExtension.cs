@@ -103,10 +103,10 @@ public static class UriExtension
     }
 
     /// <summary>
-    /// Removes last segment.
+    /// Removes the final path segment from an absolute URI while preserving its query string and fragment.
     /// </summary>
-    /// <param name="uri">The uri.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="uri">The destination URI.</param>
+    /// <returns>A URI without its final path segment.</returns>
     [Pure, MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static System.Uri RemoveLastSegment(this System.Uri uri)
     {

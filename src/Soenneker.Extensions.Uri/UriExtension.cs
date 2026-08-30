@@ -13,17 +13,20 @@ public static class UriExtension
     /// Returns a new URI in which the last path segment of the specified URI is replaced with the given replacement
     /// string.
     /// </summary>
-    /// <remarks>The query and fragment components of the original URI, if present, are preserved in the
-    /// returned URI. This method does not modify the original URI instance.</remarks>
+    /// <remarks>The replacement is escaped as one path segment. The query and fragment components of the original URI,
+    /// if present, are preserved. This method does not modify the original URI instance.</remarks>
     /// <param name="uri">The source URI whose last path segment is to be replaced. Must be an absolute URI.</param>
     /// <param name="replacement">The string to use as the new last path segment. Cannot be null.</param>
     /// <returns>A new absolute URI with the last path segment replaced by the specified replacement string. If the original URI
     /// has no path, the replacement is appended as the first path segment.</returns>
+    /// <exception cref="UriFormatException">The replacement is <c>.</c> or <c>..</c>, which would be canonicalized as path navigation.</exception>
     [Pure, MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static System.Uri ReplaceLastSegment(this System.Uri uri, string replacement)
     {
         ArgumentNullException.ThrowIfNull(uri);
         ArgumentNullException.ThrowIfNull(replacement);
+
+        string escapedReplacement = EscapePathSegment(replacement);
 
         // absoluteUri includes query/fragment
         string s = uri.AbsoluteUri;
@@ -41,9 +44,9 @@ public static class UriExtension
             int prefixLen = suffixStart;
             int afterLen = span.Length - suffixStart;
 
-            int totalLen = prefixLen + 1 + replacement.Length + afterLen;
+            int totalLen = prefixLen + 1 + escapedReplacement.Length + afterLen;
 
-            var result = string.Create(totalLen, (s, prefixLen, afterLen, replacement), static (dest, state) =>
+            var result = string.Create(totalLen, (s, prefixLen, afterLen, escapedReplacement), static (dest, state) =>
             {
                 (string src, int pLen, int aLen, string repl) = state;
                 src.AsSpan(0, pLen)
@@ -65,7 +68,7 @@ public static class UriExtension
         // Safety fallback (shouldn’t happen for absolute URIs, but keep it cheap)
         if (lastSlash < 0)
         {
-            var result = string.Create(span.Length + 1 + replacement.Length, (s, replacement), static (dest, state) =>
+            var result = string.Create(span.Length + 1 + escapedReplacement.Length, (s, escapedReplacement), static (dest, state) =>
             {
                 (string src, string repl) = state;
                 src.AsSpan()
@@ -85,9 +88,9 @@ public static class UriExtension
         int beforeLen = lastSlash + 1; // include slash
         int afterLen2 = span.Length - suffixStart; // includes ?/# or empty
 
-        int totalLen2 = beforeLen + replacement.Length + afterLen2;
+        int totalLen2 = beforeLen + escapedReplacement.Length + afterLen2;
 
-        var result2 = string.Create(totalLen2, (s, beforeLen, suffixStart, replacement), static (dest, state) =>
+        var result2 = string.Create(totalLen2, (s, beforeLen, suffixStart, escapedReplacement), static (dest, state) =>
         {
             (string src, int bLen, int sufStart, string repl) = state;
 
@@ -158,6 +161,16 @@ public static class UriExtension
     {
         int i = span.IndexOfAny('?', '#');
         return i < 0 ? span.Length : i;
+    }
+
+    private static string EscapePathSegment(string replacement)
+    {
+        // System.Uri canonicalizes dot-only segments as navigation, even when the dots are escaped.
+        return replacement switch
+        {
+            "." or ".." => throw new UriFormatException("A dot-only replacement cannot be represented as a safe URI path segment."),
+            _ => System.Uri.EscapeDataString(replacement)
+        };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

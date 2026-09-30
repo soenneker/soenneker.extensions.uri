@@ -5,7 +5,7 @@ namespace Soenneker.Extensions.Uri.Tests;
 public class UriExtensionTests : UnitTest
 {
     [Test]
-    public async System.Threading.Tasks.Task ReplaceLastSegment_EscapesSegmentData()
+    public async System.Threading.Tasks.ValueTask ReplaceLastSegment_EscapesSegmentData()
     {
         var uri = new System.Uri("https://example.com/api/old?download=1#result");
 
@@ -15,7 +15,7 @@ public class UriExtensionTests : UnitTest
     }
 
     [Test]
-    public async System.Threading.Tasks.Task ReplaceLastSegment_RejectsDotDotNavigation()
+    public async System.Threading.Tasks.ValueTask ReplaceLastSegment_RejectsDotDotNavigation()
     {
         var uri = new System.Uri("https://example.com/api/old");
         var threw = false;

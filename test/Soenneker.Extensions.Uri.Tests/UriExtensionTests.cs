@@ -1,11 +1,12 @@
 using Soenneker.Tests.Unit;
+using System.Threading;
 
 namespace Soenneker.Extensions.Uri.Tests;
 
 public class UriExtensionTests : UnitTest
 {
     [Test]
-    public async System.Threading.Tasks.ValueTask ReplaceLastSegment_EscapesSegmentData()
+    public async System.Threading.Tasks.ValueTask ReplaceLastSegment_EscapesSegmentData(CancellationToken cancellationToken)
     {
         var uri = new System.Uri("https://example.com/api/old?download=1#result");
 
@@ -15,7 +16,7 @@ public class UriExtensionTests : UnitTest
     }
 
     [Test]
-    public async System.Threading.Tasks.ValueTask ReplaceLastSegment_RejectsDotDotNavigation()
+    public async System.Threading.Tasks.ValueTask ReplaceLastSegment_RejectsDotDotNavigation(CancellationToken cancellationToken)
     {
         var uri = new System.Uri("https://example.com/api/old");
         var threw = false;
